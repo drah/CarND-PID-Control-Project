@@ -1,7 +1,34 @@
 # CarND-Controls-PID
 Self-Driving Car Engineer Nanodegree Program
+## Compilation
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+$ ./pid
+
+## Implementation
+PID control with twiddle algorithm tuned parameters.
+
+## Reflection
+P: propotional, the steering angle is propotional to the cross track error($$p\_error$$).
+I: integral, the steering angle is propotional to the sum of the cross track errors($$i\_error$$).
+D: differential, the steering angle is propotional to the difference between current cross track error and the previous one($$d\_error$$).
+
+P help the car head to the track line but would make the car occilate along the track line when working alone.
+with D's help, the occilation would be relieved.
+However, without I, the car might not be able to converge to the track line due to the steering drift.
+
+The steering angle is calculated by the weighted sum of P, I, and D, as the following:
+$$ steering angle \equal - ( p\_coef * p\_error + i\_coef * i\_error + d\_coef * d\_error ) $$
+where the $$p\_error$$, $$i\_error$$, $$d\_error$$ are picked by twiddle algorithm with initialized values 1.0, 0.0001, 3.0.
+Please refer to the src/PID.cpp for more details.
+
+## Simulation
+The vehicle successfully drives a lap around the track.
 
 ---
+# The followings are from the original repository
 
 ## Dependencies
 
