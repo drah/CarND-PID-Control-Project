@@ -20,9 +20,9 @@ Self-Driving Car Engineer Nanodegree Program
 - However, without I, the car might not be able to converge to the track line due to the steering drift.
 
 - The steering angle is calculated by the weighted sum of P, I, and D, as the following:
-steering_angle = - ( p\_coef * p\_error + i\_coef * i\_error + d\_coef * d\_error )
-where the p_error, i_error, d_error are picked by twiddle algorithm with initialized values 1.0, 0.0001, 3.0.
-Please refer to the src/PID.cpp line 56 to line 132 for more details.
+- steering_angle = - ( p\_coef * p\_error + i\_coef * i\_error + d\_coef * d\_error )
+- where the p_error, i_error, d_error are picked by twiddle algorithm with initialized values 1.0, 0.0001, 3.0.
+- Please refer to the src/PID.cpp line 56 to line 132 for more details.
 
 ## Simulation
 The vehicle successfully drives a lap around the track.
