@@ -1,12 +1,20 @@
 #ifndef PID_H
 #define PID_H
+#include <string>
+#include <fstream>
+#include <iostream>
+using std::fstream;
+using std::string;
+using std::endl;
+using std::cout;
+#define N_ERROR (100)
 
 class PID {
  public:
   /**
    * Constructor
    */
-  PID();
+  PID(bool);
 
   /**
    * Destructor.
@@ -17,7 +25,7 @@ class PID {
    * Initialize PID.
    * @param (Kp_, Ki_, Kd_) The initial PID coefficients
    */
-  void Init(double Kp_, double Ki_, double Kd_);
+  void Init(string params_path);
 
   /**
    * Update the PID error variables given cross track error.
@@ -45,6 +53,28 @@ class PID {
   double Kp;
   double Ki;
   double Kd;
+
+  /* twiddle */
+  bool tune;
+  string params_path;
+  int run_count;
+  int error_count;
+  double sum_error;
+  double average_error;
+  double dp;
+  double di;
+  double dd;
+  double min_error;
+  int state;
+  enum State {
+    TWIDDLE_STATE_INIT,
+    INC_P,
+    DEC_P,
+    INC_I,
+    DEC_I,
+    INC_D,
+    DEC_D
+  };
 };
 
 #endif  // PID_H
