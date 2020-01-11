@@ -65,6 +65,9 @@ class PID {
   double di;
   double dd;
   double min_error;
+  double best_Kp;
+  double best_Ki;
+  double best_Kd;
   int state;
   enum State {
     TWIDDLE_STATE_INIT,

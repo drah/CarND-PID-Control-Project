@@ -11,11 +11,12 @@ PID::~PID() {
     average_error = sum_error / error_count;
   else
     average_error = 0.;
-  fstream out(params_path);
+  fstream out(params_path, fstream::trunc);
   out << Kp << endl << Ki << endl << Kd << endl;
   out << run_count << endl << error_count << endl << sum_error << endl << average_error << endl;
   out << dp << endl << di << endl << dd << endl;
-  out << min_error << endl << state;
+  out << min_error << endl << state << endl;
+  out << best_Kp << endl << best_Ki << endl << best_Kd;
   out.close();
 }
 
@@ -26,14 +27,21 @@ void PID::Init(string params_path){
   this->params_path = params_path;
   fstream in(params_path);
   in >> Kp >> Ki >> Kd;
-  in >> run_count >> error_count >> average_error;
+  in >> run_count >> error_count >> sum_error >> average_error;
   in >> dp >> di >> dd;
   in >> min_error >> state;
+  in >> best_Kp >> best_Ki >> best_Kd;
   in.close();
-
-  if(state == TWIDDLE_STATE_INIT){
-    Kp += dp;
-    state = 1;
+  if(!tune){
+    Kp = best_Kp;
+    Ki = best_Ki;
+    Kd = best_Kd;
+  }
+  else{
+    if(state == TWIDDLE_STATE_INIT){
+      Kp += dp;
+      state = 1;
+    }
   }
 }
 
@@ -46,16 +54,17 @@ void PID::UpdateError(double cte) {
   p_error = cte;
 
   run_count += 1;
-  if(run_count >= N_ERROR){
-    sum_error += cte;
+  if(tune && run_count >= N_ERROR){
+    sum_error += cte * cte;
     error_count += 1;
     if(error_count == N_ERROR){
       average_error = sum_error / error_count;
-      run_count = 0;
-      error_count = 0;
       // twiddle core
       if(average_error < min_error){
         min_error = average_error;
+        best_Kp = Kp;
+        best_Ki = Ki;
+        best_Kd = Kd;
         switch(state){
           case INC_P:
           case DEC_P:
@@ -116,6 +125,10 @@ void PID::UpdateError(double cte) {
             cout << "state error: " << state << endl;
         }
       }
+      run_count = 0;
+      error_count = 0;
+      sum_error = 0.;
+      average_error = 0.;
     }
   }
   cout << "state=" << state << endl;
@@ -123,6 +136,8 @@ void PID::UpdateError(double cte) {
   cout << "dp=" << dp << ", di=" << di << ", dd=" << dd << endl;
   cout << "run_count=" << run_count << ", error_count=" << error_count << endl;
   cout << "sum_error=" << sum_error << ", average_error=" << average_error << endl;
+  cout << "min_error=" << min_error << endl;
+  cout << "best_Kp=" << best_Kp << ", best_Ki=" << best_Ki << ", best_Kd=" << best_Kd << endl;
 }
 
 double PID::TotalError() {
